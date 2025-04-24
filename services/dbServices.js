@@ -6,13 +6,13 @@ const { connect_timeout, idleTimeoutMillis } = require('pg/lib/defaults');
 // Set up connection to DB and CRUD ops
 
 // local development uncomment below
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-  });
+// const pool = new Pool({
+//    user: process.env.DB_USER,
+//    host: process.env.DB_HOST,
+//    database: process.env.DB_DATABASE,
+//    password: process.env.DB_PASSWORD,
+//    port: process.env.DB_PORT,
+//  });
 
 
 //   hosted on heroku for my hosted version only
@@ -31,19 +31,19 @@ async () => {
 
 }
 
-// const dns = require('dns');
+ const dns = require('dns');
 
-// // Force Node.js to prioritize IPv4 over IPv6
-// dns.setDefaultResultOrder('ipv4first');
+ Force Node.js to prioritize IPv4 over IPv6
+ dns.setDefaultResultOrder('ipv4first');
 
-//  const pool = new Pool({
-//     connectionString: process.env.SUPABASE_DB_URL,
-//      ssl:{
-//          rejectUnauthorized: false
-//      },
-//      connect_timeout: 5,
-//      idleTimeoutMillis: 30000
-//  });
+  const pool = new Pool({
+     connectionString: process.env.SUPABASE_DB_URL,
+      ssl:{
+          rejectUnauthorized: false
+      },
+      connect_timeout: 5,
+      idleTimeoutMillis: 30000
+  });
   
 pool.connect()
     .then(() => console.log('Connected to PostgreSQL'))
