@@ -1,7 +1,18 @@
+// Force environment variables since .env isn't loading
+process.env.NODE_ENV = 'production';
+process.env.SUPABASE_DB_URL = 'postgresql://postgres.qxsjjkughdhjwgptbcih:Scss_Exp2_2025!@aws-0-eu-west-2.pooler.supabase.com:5432/postgres';
+process.env.SESSION_SECRET = 'scss_exp2';
+
+// Then try to load from .env file as a backup
+require("dotenv").config();
+
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("SUPABASE_DB_URL exists:", !!process.env.SUPABASE_DB_URL);
+
 // Load environment variables
-if (process.env.NODE_ENV !== "production") {
-    require("dotenv").config();
-  }
+//if (process.env.NODE_ENV !== "production") {
+//    require("dotenv").config();
+//  }
   
 // Import modules and configurations
 const express = require('express');

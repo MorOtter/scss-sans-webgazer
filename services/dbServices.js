@@ -1,24 +1,27 @@
 // imports
-
 const {Pool} = require('pg');
 const { connect_timeout, idleTimeoutMillis } = require('pg/lib/defaults');
+const dns = require('dns');
 
-// Set up connection to DB and CRUD ops
+// Force Node.js to prioritize IPv4 over IPv6
+dns.setDefaultResultOrder('ipv4first');
 
-// local development uncomment below
-// const pool = new Pool({
-//    user: process.env.DB_USER,
-//    host: process.env.DB_HOST,
-//    database: process.env.DB_DATABASE,
-//    password: process.env.DB_PASSWORD,
-//    port: process.env.DB_PORT,
-//  });
+// Force Supabase connection
+console.log("Forcing Supabase database configuration");
+const pool = new Pool({
+  connectionString: 'postgresql://postgres.qxsjjkughdhjwgptbcih:Scss_Exp2_2025!@aws-0-eu-west-2.pooler.supabase.com:5432/postgres',
+  ssl: {
+    rejectUnauthorized: false
+  },
+  connect_timeout: 5,
+  idleTimeoutMillis: 30000
+});
 
+pool.connect()
+    .then(() => console.log('Connected to PostgreSQL'))
+    .catch(err => console.error("Connection error", err.stack));
 
-//   hosted on heroku for my hosted version only
-
-const getLastTrialId = 
-async () => {
+const getLastTrialId = async () => {
     const client = await pool.connect();
     try {
         const query = "SELECT MAX(trial_id) AS max_id FROM trials;"
@@ -28,28 +31,9 @@ async () => {
     } finally {
         client.release();
     }
-
 }
 
- const dns = require('dns');
-
- Force Node.js to prioritize IPv4 over IPv6
- dns.setDefaultResultOrder('ipv4first');
-
-  const pool = new Pool({
-     connectionString: process.env.SUPABASE_DB_URL,
-      ssl:{
-          rejectUnauthorized: false
-      },
-      connect_timeout: 5,
-      idleTimeoutMillis: 30000
-  });
-  
-pool.connect()
-    .then(() => console.log('Connected to PostgreSQL'))
-    .catch(err => console.error("Connection error", err.stack));
-
-
+// Rest of your functions remain the same
 const insertParticipant = async (username, condition, groupName, censoredInfo, gender, age) => {
     const client = await pool.connect();
     try {
@@ -61,7 +45,6 @@ const insertParticipant = async (username, condition, groupName, censoredInfo, g
     } finally {
         client.release();
     }
-
 };
 
 const getNextId = async () => {
@@ -78,7 +61,6 @@ const getNextId = async () => {
     } finally {
         client.release();
     }
-
 };
 
 const insertTrial = async (participant, type, number, start, end, url) => {
@@ -99,7 +81,6 @@ const insertPacket = async (trial, user, advisor, accepted, time) => {
         const query = 'INSERT INTO packets (trial_id, user_input, advisor_recommendation, accepted, classified_time) VALUES ($1, $2, $3, $4, $5);';
         const values = [trial, user, advisor, accepted, time];
         const result = await client.query(query, values);
-        // return result.rows[0].trial_id;
     } catch (err) {
         console.error("couldnt add packet input", err.stack); 
     } finally {
@@ -107,10 +88,7 @@ const insertPacket = async (trial, user, advisor, accepted, time) => {
     }
 };
 
-
-
 const insertScale = async (participant, type, phase) => {
-   
     const client = await pool.connect();
     try {
         const query = 'INSERT INTO scales (participant_id, scale_type, scale_phase) VALUES ($1, $2, $3) RETURNING scale_id;';
@@ -123,7 +101,6 @@ const insertScale = async (participant, type, phase) => {
 };
 
 const insertItem = async (itemNumber, scale, value) => {
- 
     const client = await pool.connect();
     try {
         const query = 'INSERT INTO items (item_id, scale_id, item_value) VALUES ($1, $2, $3);';
@@ -162,24 +139,14 @@ const insertCursorData = async (dataObject, trialId) => {
 
 const dbServices = {
     insertFeedback,
-
     insertItem,
-
     insertScale,
-
     insertPacket,
-
     insertTrial,
-
     insertParticipant,
-
     getNextId,
-
     getLastTrialId,
-    
     insertCursorData
-
 };
 
-
-module.exports =   dbServices;
+module.exports = dbServices;
